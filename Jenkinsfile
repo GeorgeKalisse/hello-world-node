@@ -60,15 +60,12 @@ spec:
             steps {
                 script {
                     container('docker'){
-                        withCredentials([string(credentialsId: 'nonprod-token', variable: 'TOKEN')]) {
-                            configFileProvider(
-                                [configFile(fileId: 'docker_config_template',
-                                            targetLocation: 'config.json',
-                                            replaceTokens:true,
-                                            )]
-                            ){
+                        withCredentials([string(credentialsId: 'dockerconfigjson', variable: 'DOCKERCONFIGJSON')]) {
 
                                 sh """
+                                    printenv
+                                    echo \$DOCKERCONFIGJSON > config.json
+                                    cat config.json
                                     docker --config=\$(pwd) build \
                                               --rm=false \
                                               -t georgekalisse/helloworld:${dateFormat.format(date)} \
