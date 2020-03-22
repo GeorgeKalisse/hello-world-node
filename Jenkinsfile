@@ -49,7 +49,7 @@ spec:
         cpu: "0.5"
         memory: "500Mi"
       limits:
-        cpu: "2"
+        cpu: "1"
         memory: "6G"
     securityContext:
       privileged: true
@@ -107,22 +107,6 @@ spec:
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
-  - name: node
-    image: "node:10.19.0"
-    imagePullPolicy: Always
-    command:
-    - cat
-    tty: true
-    resources:
-      requests:
-        cpu: "0.5"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "4Gi"
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
   - name: docker
     image: "docker:19.03.7-dind"
     imagePullPolicy: Always
@@ -131,7 +115,7 @@ spec:
         cpu: "0.5"
         memory: "500Mi"
       limits:
-        cpu: "2"
+        cpu: "1"
         memory: "6G"
     securityContext:
       privileged: true
@@ -198,22 +182,6 @@ spec:
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
-  - name: node
-    image: "node:10.19.0"
-    imagePullPolicy: Always
-    command:
-    - cat
-    tty: true
-    resources:
-      requests:
-        cpu: "0.5"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "4Gi"
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
   - name: docker
     image: "docker:19.03.7-dind"
     imagePullPolicy: Always
@@ -222,7 +190,7 @@ spec:
         cpu: "0.5"
         memory: "500Mi"
       limits:
-        cpu: "2"
+        cpu: "1"
         memory: "6G"
     securityContext:
       privileged: true
