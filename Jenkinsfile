@@ -56,11 +56,10 @@ spec:
                     container('docker'){
                         withCredentials([string(credentialsId: 'nonprod-token', variable: 'TOKEN')]) {
                             configFileProvider(
-                                configFile(fileId: 'docker_config_template',
+                                [configFile(fileId: 'docker_config_template',
                                             targetLocation: 'config.json',
                                             replaceTokens:true,
-                                            )
-                                ]
+                                            )]
                             ){
 
                                 sh """
