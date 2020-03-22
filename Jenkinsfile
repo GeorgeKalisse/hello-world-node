@@ -77,8 +77,6 @@ spec:
                                         georgekalisse/helloworld:latest
                                 """
 
-
-                            }
                         }
                     }
                 }
