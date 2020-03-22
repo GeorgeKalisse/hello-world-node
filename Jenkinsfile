@@ -1,3 +1,9 @@
+#!groovy
+
+import java.io.*;
+import java.util.*;
+import java.text.SimpleDateFormat;
+
 def dateFormat = new SimpleDateFormat("yyyyMMddHHmm")
 def date = new Date()
 def helmChartRepo = 'https://github.com/GeorgeKalisse/helm.git'
