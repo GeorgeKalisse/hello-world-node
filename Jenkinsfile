@@ -145,9 +145,6 @@ spec:
 
                     container('helm'){
                         withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
-                            sh 'kubectl config current-context'
-                            sh "more $KUBECONFIG >> ${WORKSPACE}/kubeconfig"
-                            sh "chmod 755 ${WORKSPACE}/kubeconfig"
                             sh """
                                 helm template --name=hello-world --namespace=${namespace} devops/helm/${chartName} \
                                     --set image.tag=${dateFormat.format(date)} > template.yaml
@@ -157,6 +154,9 @@ spec:
                     }
                     container('kubectl'){
                         withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
+                            sh 'kubectl config current-context'
+                            sh "more $KUBECONFIG >> ${WORKSPACE}/kubeconfig"
+                            sh "chmod 755 ${WORKSPACE}/kubeconfig"
                             sh "kubectl -n ${namespace} apply --dry-run -f template.yaml"
                             sleep 3000
                         }
