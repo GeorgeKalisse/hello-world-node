@@ -107,16 +107,21 @@ spec:
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
-  - name: docker
-    image: "docker:19.03.7-dind"
+  - name: helm
+    image: alpine/helm:2.14.0
     imagePullPolicy: Always
-    resources:
-      requests:
-        cpu: "0.5"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "6G"
+    command:
+    - cat
+    tty: true
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+  - name: kubectl
+    image: lachlanevenson/k8s-kubectl:v1.15.0
+    imagePullPolicy: Always
+    command:
+    - cat
+    tty: true
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
@@ -125,13 +130,9 @@ spec:
             }
             steps {
                 script {
-                    container('docker'){
-                        withCredentials([string(credentialsId: 'dockerconfigjson', variable: 'DOCKERCONFIGJSON')]) {
-
-                                sh """
-                                    echo deploying to non-prod
-                                """
-
+                    container('kubectl'){
+                        withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://34.73.244.22']) {
+                            sleep 3000
                         }
                     }
                 }
@@ -182,16 +183,21 @@ spec:
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
-  - name: docker
-    image: "docker:19.03.7-dind"
+  - name: helm
+    image: alpine/helm:2.14.0
     imagePullPolicy: Always
-    resources:
-      requests:
-        cpu: "0.5"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "6G"
+    command:
+    - cat
+    tty: true
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+  - name: kubectl
+    image: lachlanevenson/k8s-kubectl:v1.15.0
+    imagePullPolicy: Always
+    command:
+    - cat
+    tty: true
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
