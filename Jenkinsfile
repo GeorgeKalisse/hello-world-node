@@ -231,7 +231,7 @@ spec:
             }
             steps {
                 script {
-                    container('docker'){
+                    container('kubectl'){
                         withCredentials([string(credentialsId: 'dockerconfigjson', variable: 'DOCKERCONFIGJSON')]) {
 
                                 sh """
@@ -242,6 +242,14 @@ spec:
                     }
                 }
             }
+        }
+    }
+    post {
+        success {
+            slackSend (color: '#00FF00', message: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'")
+        }
+        failure {
+            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'")
         }
     }
 }
