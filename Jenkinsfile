@@ -69,11 +69,11 @@ spec:
                                     cat config.json
                                     docker --config=\$(pwd) build \
                                               --rm=false \
-                                              -t georgekalisse/helloworld:${dateFormat.format(date)} \
+                                              -t georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)} \
                                               \$(pwd)
-                                    docker tag georgekalisse/helloworld:${dateFormat.format(date)} georgekalisse/helloworld:latest
+                                    docker tag georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)} georgekalisse/helloworld:latest
                                     docker --config=\$(pwd) push \
-                                        georgekalisse/helloworld:${dateFormat.format(date)}
+                                        georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)}
                                     docker --config=\$(pwd) push \
                                         georgekalisse/helloworld:latest
                                 """
@@ -146,7 +146,7 @@ spec:
                         withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
                             sh """
                                     helm template --name=hello-world --namespace=${namespace} ${chartName} \
-                                    --set image.tag=${dateFormat.format(date)} > template.yaml
+                                        --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} > template.yaml
                             """
 
                         }
