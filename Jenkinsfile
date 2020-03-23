@@ -7,7 +7,8 @@ import java.text.SimpleDateFormat;
 def dateFormat = new SimpleDateFormat("yyyyMMddHHmm")
 def date = new Date()
 def helmChartRepo = 'https://github.com/GeorgeKalisse/helm.git'
-def chartName = 'mysupport'
+def chartName = 'hello-world'
+def namespace = 'sample-app'
 
 pipeline {
     agent none
@@ -130,8 +131,33 @@ spec:
             }
             steps {
                 script {
+
+                    dir('devops') {
+                      checkout([$class: 'GitSCM',
+                        branches: [[name: '*/master']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[credentialsId: 'george-github', url: "${helmChartRepo}"]]
+                      ]){
+                          sh "ls -la"
+                      }
+
+                    container('helm'){
+                        withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
+                            sh 'kubectl config current-context'
+                            sh "more $KUBECONFIG >> ${WORKSPACE}/kubeconfig"
+                            sh "chmod 755 ${WORKSPACE}/kubeconfig"
+                            sh """
+                                helm template --name=hello-world --namespace=${namespace} devops/helm/${chartName} \
+                                    --set image.tag=${dateFormat.format(date)} > template.yaml
+                            """
+
+                        }
+                    }
                     container('kubectl'){
-                        withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://34.73.244.22']) {
+                        withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
+                            sh "kubectl -n ${namespace} apply --dry-run -f template.yaml"
                             sleep 3000
                         }
                     }
