@@ -141,7 +141,6 @@ spec:
                         userRemoteConfigs: [[credentialsId: 'george-github', url: "${helmChartRepo}"]]
                       ])
                           sh "ls -la"
-                      }
 
                     container('helm'){
                         withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
@@ -163,6 +162,7 @@ spec:
                     }
                 }
             }
+        }
         }
         stage('Promote to Prod?') {
             agent none
