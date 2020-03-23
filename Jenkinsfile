@@ -145,7 +145,7 @@ spec:
                     container('helm'){
                         withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
                             sh """
-                                    helm template --name=hello-world --namespace=${namespace} helm/${chartName} \
+                                    helm template --name=hello-world --namespace=${namespace} ${chartName} \
                                     --set image.tag=${dateFormat.format(date)} > template.yaml
                             """
 
