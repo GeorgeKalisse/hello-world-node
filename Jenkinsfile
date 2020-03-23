@@ -139,7 +139,7 @@ spec:
                         extensions: [],
                         submoduleCfg: [],
                         userRemoteConfigs: [[credentialsId: 'george-github', url: "${helmChartRepo}"]]
-                      ]){
+                      ])
                           sh "ls -la"
                       }
 
