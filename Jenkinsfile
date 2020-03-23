@@ -156,8 +156,7 @@ spec:
                             sh 'kubectl config current-context'
                             sh "more $KUBECONFIG >> ${WORKSPACE}/kubeconfig"
                             sh "chmod 755 ${WORKSPACE}/kubeconfig"
-                            sh "kubectl -n ${namespace} apply --dry-run -f template.yaml"
-                            sleep 3000
+                                sh "kubectl -n ${namespace} apply -f template.yaml"
                         }
                     }
                 }
