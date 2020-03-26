@@ -211,6 +211,7 @@ pipeline {
                             withKubeConfig([credentialsId: 'prod1-token', serverUrl: 'https://35.231.92.197']) {
                                 sh """
                                     helm template --name=hello-world --namespace=${namespace} ${chartName} \
+                                        --set replicaCount=3 \
                                         --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} > template.yaml
                                 """
 
