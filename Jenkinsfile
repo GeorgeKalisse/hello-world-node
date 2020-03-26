@@ -10,18 +10,7 @@ def helmChartRepo = 'https://github.com/GeorgeKalisse/helm.git'
 def chartName = 'hello-world'
 def namespace = 'sample-app'
 
-pipeline {
-    agent none
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-        timeout(time: 14, unit: 'HOURS')
-    }
-    stages {
-        stage('build') {
-            agent {
-                kubernetes {
-                    defaultContainer 'jnlp'
-                    yaml """
+def buildAgentPodTemplate = """
 apiVersion: v1
 kind: Pod
 metadata:
@@ -56,38 +45,8 @@ spec:
       privileged: true
       allowPrivilegeEscalation: true
                     """
-                }
-            }
-            steps {
-                script {
-                    container('docker'){
-                        withCredentials([string(credentialsId: 'dockerconfigjson', variable: 'DOCKERCONFIGJSON')]) {
 
-                                sh """
-                                    printenv
-                                    echo \$DOCKERCONFIGJSON > config.json
-                                    cat config.json
-                                    docker --config=\$(pwd) build \
-                                              --rm=false \
-                                              -t georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)} \
-                                              \$(pwd)
-                                    docker tag georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)} georgekalisse/helloworld:latest
-                                    docker --config=\$(pwd) push \
-                                        georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)}
-                                    docker --config=\$(pwd) push \
-                                        georgekalisse/helloworld:latest
-                                """
-
-                        }
-                    }
-                }
-            }
-        }
-        stage('Deploy to Non-Prod') {
-            agent {
-                kubernetes {
-                    defaultContainer 'jnlp'
-                    yaml """
+def deployAgentPodTemplate = """
 apiVersion: v1
 kind: Pod
 metadata:
@@ -127,6 +86,51 @@ spec:
       privileged: true
       allowPrivilegeEscalation: true
                     """
+
+pipeline {
+    agent none
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 14, unit: 'HOURS')
+    }
+    stages {
+        stage('build') {
+            agent {
+                kubernetes {
+                    defaultContainer 'jnlp'
+                    yaml buildAgentPodTemplate
+                }
+            }
+            steps {
+                script {
+                    container('docker'){
+                        withCredentials([string(credentialsId: 'dockerconfigjson', variable: 'DOCKERCONFIGJSON')]) {
+
+                                sh """
+                                    printenv
+                                    echo \$DOCKERCONFIGJSON > config.json
+                                    cat config.json
+                                    docker --config=\$(pwd) build \
+                                              --rm=false \
+                                              -t georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)} \
+                                              \$(pwd)
+                                    docker tag georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)} georgekalisse/helloworld:latest
+                                    docker --config=\$(pwd) push \
+                                        georgekalisse/helloworld:${GIT_COMMIT[0..7]}-${dateFormat.format(date)}
+                                    docker --config=\$(pwd) push \
+                                        georgekalisse/helloworld:latest
+                                """
+
+                        }
+                    }
+                }
+            }
+        }
+        stage('Deploy to Non-Prod') {
+            agent {
+                kubernetes {
+                    defaultContainer 'jnlp'
+                    yaml deployAgentPodTemplate
                 }
             }
             steps {
@@ -187,46 +191,7 @@ spec:
             agent {
                 kubernetes {
                     defaultContainer 'jnlp'
-                    yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-spec:
-  serviceAccount: "jenkins-agent"
-  containers:
-  - name: jnlp
-    image: "jenkins/jnlp-slave:3.29-1"
-    imagePullPolicy: Always
-    tty: true
-    resources:
-      requests:
-        cpu: "0.5"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "1G"
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
-  - name: helm
-    image: alpine/helm:2.14.0
-    imagePullPolicy: Always
-    command:
-    - cat
-    tty: true
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
-  - name: kubectl
-    image: lachlanevenson/k8s-kubectl:v1.15.0
-    imagePullPolicy: Always
-    command:
-    - cat
-    tty: true
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
-                    """
+                    yaml deployAgentPodTemplate
                 }
             }
             steps {
