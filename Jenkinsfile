@@ -150,7 +150,8 @@ pipeline {
                         withKubeConfig([credentialsId: 'nonprod-token', serverUrl: 'https://34.73.244.22']) {
                             sh """
                                     helm template --name=hello-world --namespace=${namespace} ${chartName} \
-                                        --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} > template.yaml
+                                        --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} \
+                                        -f ${chartName}/values-nonprod.yaml > template.yaml
                             """
 
                         }
@@ -212,7 +213,8 @@ pipeline {
                                 sh """
                                     helm template --name=hello-world --namespace=${namespace} ${chartName} \
                                         --set replicaCount=3 \
-                                        --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} > template.yaml
+                                        --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} \
+                                        -f ${chartName}/values-prod1.yaml > template.yaml
                                 """
 
                             }
