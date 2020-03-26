@@ -196,13 +196,33 @@ pipeline {
             }
             steps {
                 script {
-                    container('kubectl'){
-                        withCredentials([string(credentialsId: 'dockerconfigjson', variable: 'DOCKERCONFIGJSON')]) {
 
+                    dir('devops') {
+                      checkout([$class: 'GitSCM',
+                        branches: [[name: '*/master']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[credentialsId: 'george-github', url: "${helmChartRepo}"]]
+                      ])
+                          sh "ls -la"
+
+                        container('helm'){
+                            withKubeConfig([credentialsId: 'prod1-token', serverUrl: 'https://35.231.92.197']) {
                                 sh """
-                                    echo deploying to prod
+                                    helm template --name=hello-world --namespace=${namespace} ${chartName} \
+                                        --set image.tag=${GIT_COMMIT[0..7]}-${dateFormat.format(date)} > template.yaml
                                 """
 
+                            }
+                        }
+                        container('kubectl'){
+                            withKubeConfig([credentialsId: 'prod1-token', serverUrl: 'https://35.231.92.197']) {
+                                sh 'kubectl config current-context'
+                                sh "more $KUBECONFIG >> ${WORKSPACE}/kubeconfig"
+                                sh "chmod 755 ${WORKSPACE}/kubeconfig"
+                                sh "kubectl -n ${namespace} apply -f template.yaml"
+                            }
                         }
                     }
                 }
