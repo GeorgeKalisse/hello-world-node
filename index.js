@@ -4,7 +4,7 @@ const cluster = process.env.CLUSTER || "non-prod";
 
 const server = http.createServer((req, res) => {
   res.statusCode = 200;
-  res.end(`Hello World!\nThis is the ${cluster} cluster`);
+  res.end(`Hello Arctiq!\nThis is the ${cluster} cluster`);
 });
 
 server.listen(port, () => {
